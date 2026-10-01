@@ -1,0 +1,17 @@
+.env
+.env.*
+.venv/
+__pycache__/
+*.py[cod]
+data/
+models/
+adapters/
+runs/
+dist/
+*.zip
+*.safetensors
+*.pem
+*.key
+.secrets/
+configs/local.json
+notes-local/
