@@ -12,9 +12,12 @@ Python 3.12 is sufficient for the current standard-library-only tools:
 
 ```sh
 python tools/check_setup.py
+python -m unittest discover -s tests -v
 ```
 
 This offline check works in a fresh clone and in Codex Cloud. It does not require API keys, a local registry or downloaded models.
+
+The tests use isolated temporary fixtures and fake credentials. GitHub Actions runs the checks on Ubuntu and Windows with Python 3.12 for pull requests and main-branch pushes.
 
 ## Codex Cloud setup
 
@@ -50,6 +53,7 @@ The second command also loads the selected credential in memory, without making 
 Use English for shared documentation, code comments, tasks, commits and pull requests. Local conversations may use the user's preferred language. Work on separate branches and review pull requests before merging.
 
 - `TASKS.md`: task board and acceptance criteria.
+- `docs/PLAN.md`: execution stages, blockers and collaboration workflow; GitHub Issues #1-#5 track status and acceptance criteria.
 - `experiments/`: experiment protocol and results table.
 - `configs/project.json`: public model and endpoint configuration.
 - `submission/`: official harness integration placeholder, not a valid submission.

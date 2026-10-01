@@ -1,25 +1,15 @@
-# Task board
+# Roadmap and issue index
 
-Update this file with evidence when completing work. Plans, imports and prototype runs are not official evaluation results.
+GitHub Issues are the source of truth for task status, ownership and acceptance criteria. This file links the milestones; do not maintain a second detailed checklist here.
 
-## Completed
+See [docs/PLAN.md](docs/PLAN.md) for the evidence-based execution plan.
 
-- [x] Initialize the project, model configuration and central registry conventions.
-- [x] Add portable offline checks and optional local credential checks.
-- [x] Establish English collaboration documents and experiment records.
+| Order | Milestone | Issue | Dependency |
+|---|---|---|---|
+| 0 | Portable checks and cross-platform CI | [#1](https://github.com/apedintensor/gemma-developer-agent/issues/1) | None |
+| 1 | Official harness and runtime requirements | [#2](https://github.com/apedintensor/gemma-developer-agent/issues/2) | Owner signs in and accepts Kaggle rules |
+| 2 | One official task end to end | [#3](https://github.com/apedintensor/gemma-developer-agent/issues/3) | #2; working runtime and compute |
+| 3 | Frozen validation split and baseline | [#4](https://github.com/apedintensor/gemma-developer-agent/issues/4) | #3 |
+| 4 | Workflow experiments and LoRA decision | [#5](https://github.com/apedintensor/gemma-developer-agent/issues/5) | #4 |
 
-## Next: official baseline
-
-- [ ] Obtain HARNESS_README.md and sample_submission through Kaggle. Requires login and acceptance of competition rules. Record source/version and redistribution permissions.
-- [ ] Confirm evaluation hardware, context/time budgets, tool protocol, dependencies and LoRA compatibility against official documentation.
-- [ ] Set up the official environment and solve one public development task. Capture patch, test outcome and elapsed time.
-- [ ] Fix development/validation task IDs; prevent reference patches and evaluation tests from entering validation-agent context.
-- [ ] Run a single-agent baseline without fine-tuning. Record success rate, failure categories, timing and reproducible configuration.
-
-## Later experiments
-
-- [ ] Optional AI Studio prototype after confirming account access, limits and authorization to call the API.
-- [ ] Compare retrieval, test-feedback and time-allocation strategies; change one major variable per experiment.
-- [ ] Use observed failures to decide whether to build SFT trajectories and train LoRA; establish a compute budget before provisioning GPUs.
-- [ ] Measure LoRA gains before considering RL or multiple agents.
-- [ ] Package and validate submission.zip against the official schema, then submit when authorized.
+Assign one owner per issue once the collaborator is identified. Keep shared discussion in English; use separate branches and linked pull requests. A Projects board is optional and currently blocked by missing project API scope; Issues remain usable.
