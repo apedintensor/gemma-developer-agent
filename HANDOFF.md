@@ -2,7 +2,15 @@
 
 Last updated: October 2, 2026 (Australia/Sydney). This is a historical checkpoint; inspect current files and Git state before making changes.
 
-## October 2 checkpoint
+## Latest API checkpoint
+
+The owner authorized running ten public tasks through the Gemma API to measure cost. Final run `api-ten-20261002-v5` completed: 71 generation responses, 386,983 recorded tokens, 41.5 minutes summed task wall time, 0/10 resolved. All ten reached the four-minute agent timeout. Including setup attempts and probes, recorded usage totals 503,701 tokens. Google listed Gemma 4 input/output free of charge; the US$0 estimate is not a verified billing statement.
+
+The account returned a 16,000 input-token/minute limit. Token-aware pacing avoided 429 in the final batch, but waiting counted against task time. Nine reference controls pass; Requests 7502 retains four network-timeout failures. A /tmp write_file instruction mismatch and sparse rich_3105 task description were also observed. See docs/API_RESULTS.md and docs/API_BASELINE.md before interpreting the result or rerunning. Do not repeat the ten-task batch without a new request.
+
+Gemini credentials were loaded from the central registry in memory; live text generation, native function-call responses and usage metadata were verified for gemma-4-31b-it only. No GPU was rented, no model weights were downloaded, and the official quantized-model submission/configuration was not changed. The local task commands use bubblewrap isolation with pinned task dependency overlays. Exact runtime snapshots, task assets and logs remain ignored. PR #8 is stacked on PR #7.
+
+## Earlier October 2 checkpoint
 
 The portable checks and local credential loading pass. Nine isolated tests were added using fake registry fixtures, along with GitHub Actions for Ubuntu/Windows. See the current CI run for remote status. GitHub Issues #1-#5 now hold execution status and docs/PLAN.md contains the implementation plan.
 
@@ -50,7 +58,7 @@ The user supplied a setup screenshot showing Python 3.12.14 installed and `pytho
 
 An environment is a reusable prepared setup: selected repositories, tools, dependencies and access configuration. A new cloud task uses its own workspace based on the published setup. Continuing an existing task keeps that task's state. Publishing an environment update does not automatically replace existing tasks' state.
 
-Local and cloud do not share the same folder. The local central registry and Windows-bound encrypted credential vault are not automatically available in cloud tasks. The project currently has no cloud API credential adapter; local model inference has not been verified. A passing offline check does not establish provider access or official harness readiness.
+Local and cloud do not share the same folder. The local central registry and Windows-bound encrypted credential vault are not automatically available in cloud tasks. The project currently has no cloud API credential adapter; local GPU model inference has not been verified. The separate local API diagnostic above uses remotely hosted Gemma. A passing offline check does not establish provider access or official harness readiness.
 
 ## Why use Cloud for this project?
 
@@ -60,7 +68,7 @@ Cloud is optional. Its likely value here is independent coding work that can con
 |---|---|---|
 | Planning with the owner, local files and central registry | Local | Existing context, files and credentials are available |
 | Self-contained code changes, documentation and offline tests | Cloud or local | Cloud can work independently and produce reviewable changes |
-| API experiments | Local initially | Central credentials already load locally; account access still needs verification |
+| API experiments | Local initially | Gemma API generation verified for the selected profile; other provider access remains unverified |
 | Gemma inference/fine-tuning requiring GPUs | A separately selected GPU environment | No suitable GPU resource has been provisioned or verified here |
 
 Do not migrate everything merely because a cloud environment exists. A sensible first comparison is one small cloud coding task, reviewed locally. If it adds little value, continue local development.
@@ -86,7 +94,7 @@ The competition overview previously reported 129 public development tasks, about
 
 ## Local resources and permissions
 
-On the owner's machine, locate the registry via ignored configs/local.json or AI_REGISTRY_ROOT and follow its API_USAGE.md. Targon and Lium have centrally registered credentials and historical resource-management evidence, but no resources were provisioned for this project. Gemini has a selected local profile with offline loading verified only. Do not infer current authentication, balance or model access from those records.
+On the owner's machine, locate the registry via ignored configs/local.json or AI_REGISTRY_ROOT and follow its API_USAGE.md. Targon and Lium have centrally registered credentials and historical resource-management evidence, but no resources were provisioned for this project. Gemini has a selected local profile with live Gemma API generation verified; see the latest checkpoint above. Do not infer current authentication, balance or model access from those records.
 
 The user authorized creation and publication of this project repository. This is not blanket authorization for paid API calls, renting GPUs, uploading competition data, sharing credentials or accepting agreements. No automatic task monitor or background research job has been configured.
 

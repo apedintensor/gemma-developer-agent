@@ -4,6 +4,8 @@ This experiment uses Google AI Studio `gemma-4-31b-it` through the Gemini
 generateContent API. It is separate from Kaggle's required quantized model and
 must not be reported as an official competition score.
 
+Measured outcome: see [API_RESULTS.md](API_RESULTS.md) for final usage, cost estimate and all ten task outcomes.
+
 ## Frozen selection and configuration
 
 The ten IDs in `experiments/api-diagnostic-10-v1.json` were selected before model
