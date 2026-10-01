@@ -4,6 +4,8 @@ A research workspace for the Kaggle Gemma 4 Developer Agent competition. Build a
 
 **Status:** project scaffolding only. The official harness, dataset and sample submission have not been imported. No online inference, training or competition submission has been run.
 
+Continuing in a new local or cloud session? Read [HANDOFF.md](HANDOFF.md) for current context, verification limits and suggested next steps.
+
 ## Quick start
 
 Python 3.12 is sufficient for the current standard-library-only tools:
