@@ -12,7 +12,7 @@ The first research milestone is one real public development task completed throu
 |---|---|---|
 | Repository | Public GitHub repository; local main matched origin/main at the start of this work | Ready |
 | Portable setup | Python 3.12 standard-library configuration check passes | Ready |
-| Local credential integration | Selected Gemini profile loads from the central registry offline; endpoint matches | Offline only; provider access unverified |
+| Local credential integration | Selected Gemini profile supports live gemma-4-31b-it API generation; ten-task usage report available | API prototype verified; quantized-model result still pending |
 | Cloud setup | Earlier user screenshot showed Python 3.12.14 and a successful offline check | No official harness or API verification |
 | Kaggle access | Owner joined; authenticated downloads and submission 56753224 succeeded | Evaluation pending |
 | Docker | CLI installed; engine request fails because the Linux engine pipe is unavailable | Not running/reachable |

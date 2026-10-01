@@ -4,6 +4,8 @@ A research workspace for the Kaggle Gemma 4 Developer Agent competition. Build a
 
 **Status:** the single-agent baseline compiles with the official harness. Real-task evaluator controls pass, and Kaggle submission **56753224** was accepted (initial status: pending). Model score is not yet available. See [the baseline runbook](docs/BASELINE.md).
 
+**API diagnostic:** ten public tasks completed through `gemma-4-31b-it`: 386,983 tokens, 41.5 minutes, 0/10 resolved under the four-minute task budget and account rate limit. Published-rate cost estimate: US$0; see [the measured result and limitations](docs/API_RESULTS.md). This is separate from the pending Kaggle submission.
+
 Continuing in a new local or cloud session? Read [HANDOFF.md](HANDOFF.md) for current context, verification limits and suggested next steps.
 
 ## Quick start

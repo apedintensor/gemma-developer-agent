@@ -1,0 +1,75 @@
+{
+  "split_version": "api-diagnostic-10-v1",
+  "selection_method": "Python random.Random(42), sorted IDs within repo, 4 fastapi + 4 rich + 1 requests + 1 httpx; exclude rich_2725 before sampling",
+  "tasks": [
+    {
+      "id": "fastapi_14266",
+      "repo": "fastapi/fastapi",
+      "snapshot_bytes": 221646802
+    },
+    {
+      "id": "fastapi_13207",
+      "repo": "fastapi/fastapi",
+      "snapshot_bytes": 227913371
+    },
+    {
+      "id": "fastapi_14487",
+      "repo": "fastapi/fastapi",
+      "snapshot_bytes": 230764426
+    },
+    {
+      "id": "fastapi_14463",
+      "repo": "fastapi/fastapi",
+      "snapshot_bytes": 240910100
+    },
+    {
+      "id": "rich_3468",
+      "repo": "Textualize/rich",
+      "snapshot_bytes": 92821190
+    },
+    {
+      "id": "rich_3105",
+      "repo": "Textualize/rich",
+      "snapshot_bytes": 91309571
+    },
+    {
+      "id": "rich_3064",
+      "repo": "Textualize/rich",
+      "snapshot_bytes": 90783135
+    },
+    {
+      "id": "rich_4075",
+      "repo": "Textualize/rich",
+      "snapshot_bytes": 96979228
+    },
+    {
+      "id": "requests_7502",
+      "repo": "psf/requests",
+      "snapshot_bytes": 37463957
+    },
+    {
+      "id": "httpx_3672",
+      "repo": "encode/httpx",
+      "snapshot_bytes": 1576322
+    }
+  ],
+  "backend": "ai_studio",
+  "model": "gemma-4-31b-it",
+  "time_minutes_per_task": 4,
+  "tool_calls_per_task": 50,
+  "max_turns": 80,
+  "command_timeout_seconds": 120,
+  "temperature": 0.2,
+  "top_p": 0.95,
+  "max_output_tokens": 16384,
+  "thinking": "high (Gemini API on/off; original numerical budget not supported)",
+  "pricing_source": "https://ai.google.dev/gemini-api/docs/pricing#gemma_4",
+  "pricing_checked": "2026-10-02 Australia/Sydney",
+  "input_usd_per_million": 0,
+  "output_usd_per_million": 0,
+  "cost_basis": "Published free-tier rates; no billing statement access",
+  "sandbox": "official SubprocessManager with command execution restricted by bubblewrap; subprocess dependency environment differs from official Docker",
+  "input_token_rate_limit": 16000,
+  "pacing": "15500 estimated tokens / rolling 65 seconds",
+  "requests_control_limitation": "Four connect-timeout tests fail even with reference patch; do not interpret this task as clean model accuracy."
+}
