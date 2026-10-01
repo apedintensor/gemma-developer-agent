@@ -50,6 +50,8 @@ The second command also loads the selected credential in memory, without making 
 
 ## Working together
 
+[Project board](https://github.com/users/apedintensor/projects/1) — Todo, In Progress, In Review, Done.
+
 Use English for shared documentation, code comments, tasks, commits and pull requests. Local conversations may use the user's preferred language. Work on separate branches and review pull requests before merging.
 
 - `TASKS.md`: task board and acceptance criteria.

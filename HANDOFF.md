@@ -6,7 +6,7 @@ Last updated: October 2, 2026 (Australia/Sydney). This is a historical checkpoin
 
 The portable checks and local credential loading pass. Nine isolated tests were added using fake registry fixtures, along with GitHub Actions for Ubuntu/Windows. See the current CI run for remote status. GitHub Issues #1-#5 now hold execution status and docs/PLAN.md contains the implementation plan.
 
-The Kaggle browser remains signed out with files gated by competition-rule acceptance. Docker CLI is installed but the Linux engine is unreachable. The Projects API lacks read:project scope; an Issues-based workflow is available. The first-cloud-task suggestion below is historical: tests are now implemented, so do not duplicate that assignment. No live model request, official task or training run has occurred.
+The Kaggle browser remains signed out with files gated by competition-rule acceptance. Docker CLI is installed but the Linux engine is unreachable. The owner subsequently completed Projects authorization. The public [Project board](https://github.com/users/apedintensor/projects/1) is linked to the repository with Todo, In Progress, In Review and Done states. The first-cloud-task suggestion below is historical: tests are now implemented, so do not duplicate that assignment. No live model request, official task or training run has occurred.
 
 ## Start here
 

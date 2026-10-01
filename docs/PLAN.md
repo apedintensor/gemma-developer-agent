@@ -17,7 +17,7 @@ The first research milestone is one real public development task completed throu
 | Kaggle access | Data page still shows Sign In and asks for competition-rule acceptance | Blocked for this browser session |
 | Docker | CLI installed; engine request fails because the Linux engine pipe is unavailable | Not running/reachable |
 | WSL | Ubuntu and docker-desktop distributions listed | Presence only, not a working harness |
-| GitHub project board | CLI denied access because read:project scope is missing | Use Issues first; board optional |
+| GitHub project board | Owner completed Projects authorization; public board created and linked to this repository | [Available](https://github.com/users/apedintensor/projects/1) |
 
 ## Stage 0: reliable development loop
 
@@ -74,7 +74,7 @@ Acceptance: a controlled comparison with held-out evidence, runtime/cost tradeof
 - GitHub Issues are the source of truth for execution status; TASKS.md is a roadmap/index, not a duplicate detailed board.
 - Each issue has one accountable owner, acceptance criteria and dependencies. The collaborator's identity is not yet known; do not assign work to a guessed account.
 - Use `task/<issue-number>-<short-name>` branches and link PRs with `Closes #N`.
-- Work states: unstarted open issue -> assigned/active branch -> PR under review -> merged/closed. Add a Projects board later if desired; no additional management platform is needed now.
+- Work states: unstarted open issue -> assigned/active branch -> PR under review -> merged/closed. Use the [Project board](https://github.com/users/apedintensor/projects/1); no additional management platform is needed.
 - Shared text is English. Local explanations to the owner may be Chinese.
 - Do not ask a cloud task and a local task to modify the same files concurrently without coordinating branches.
 

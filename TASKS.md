@@ -12,4 +12,4 @@ See [docs/PLAN.md](docs/PLAN.md) for the evidence-based execution plan.
 | 3 | Frozen validation split and baseline | [#4](https://github.com/apedintensor/gemma-developer-agent/issues/4) | #3 |
 | 4 | Workflow experiments and LoRA decision | [#5](https://github.com/apedintensor/gemma-developer-agent/issues/5) | #4 |
 
-Assign one owner per issue once the collaborator is identified. Keep shared discussion in English; use separate branches and linked pull requests. A Projects board is optional and currently blocked by missing project API scope; Issues remain usable.
+Assign one owner per issue once the collaborator is identified. Keep shared discussion in English; use separate branches and linked pull requests. Use the [Project board](https://github.com/users/apedintensor/projects/1) for Todo, In Progress, In Review and Done. Issues retain acceptance criteria and discussion.
