@@ -14,9 +14,9 @@ The first research milestone is one real public development task completed throu
 | Portable setup | Python 3.12 standard-library configuration check passes | Ready |
 | Local credential integration | Selected Gemini profile loads from the central registry offline; endpoint matches | Offline only; provider access unverified |
 | Cloud setup | Earlier user screenshot showed Python 3.12.14 and a successful offline check | No official harness or API verification |
-| Kaggle access | Data page still shows Sign In and asks for competition-rule acceptance | Blocked for this browser session |
+| Kaggle access | Owner joined; authenticated downloads and submission 56753224 succeeded | Evaluation pending |
 | Docker | CLI installed; engine request fails because the Linux engine pipe is unavailable | Not running/reachable |
-| WSL | Ubuntu and docker-desktop distributions listed | Presence only, not a working harness |
+| WSL | Ubuntu / Python 3.13.15; official compiler and empty/reference evaluator controls passed | CPU validation ready; no model endpoint |
 | GitHub project board | Owner completed Projects authorization; public board created and linked to this repository | [Available](https://github.com/users/apedintensor/projects/1) |
 
 ## Stage 0: reliable development loop
@@ -27,7 +27,7 @@ This stage verifies our tooling, not the model or competition score.
 
 ## Stage 1: unlock and inspect the official harness
 
-Owner: project owner for account/rule acceptance; either contributor for technical review.
+Current checkpoint: artifacts obtained and reviewed; see [BASELINE.md](BASELINE.md). The steps below describe the reproducible process.
 
 1. The owner signs in to Kaggle and accepts the competition rules personally.
 2. Obtain HARNESS_README.md and the minimum official sample files into ignored local data storage. Avoid downloading the complete 22.42 GB dataset until required files are identified.
@@ -43,7 +43,7 @@ Depends on Stage 1.
 
 1. Choose a supported Linux/Docker execution host and make the Docker engine reachable. Confirm hardware and storage against the harness requirements before any model download or rental.
 2. Decide whether available local/Kaggle compute is sufficient or a GPU rental is necessary; obtain a concrete budget before provisioning.
-3. Use the official sample and required `gemma-4-31b-it-qat-w4a16-ct` without fine-tuning.
+3. Use the compiled single-agent configuration in submission/ and required `gemma-4-31b-it-qat-w4a16-ct` without fine-tuning.
 4. Run one task with a bounded timeout and record setup, generation and validation separately.
 5. Save the patch, evaluator exit status, relevant test results, exact model/config versions and timings in ignored run artifacts. Report the actual outcome even if the issue remains unsolved.
 
@@ -92,7 +92,7 @@ Use `gemma-4-31b-it` to explore prompts/tool interactions only when useful. Esta
 
 ## Next decision
 
-The immediate dependency is official file access, not a choice of training algorithm or project-management vendor. Once the harness is available, finalize the runtime and compute plan. No credible training budget or completion date can be promised before those requirements are known.
+The owner selected official Kaggle evaluation. Submission 56753224 is pending; inspect its result before another upload. Local CPU controls verify the evaluator but do not complete the public-task model milestone. Detailed local model trajectories require suitable compute; obtain a concrete budget before renting GPUs. Freeze validation task IDs before tuning.
 
 ## Sources
 
