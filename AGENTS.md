@@ -22,7 +22,7 @@ When X (Twitter) cannot be accessed through direct web tools, use the user's alr
 ## Project and experiments
 
 - The official model remains `gemma-4-31b-it-qat-w4a16-ct`. The optional AI Studio prototype uses `gemma-4-31b-it`. Never equate their scores.
-- The official harness and sample submission are not yet available locally. Do not fabricate a valid agent.yaml or install arbitrary framework versions before consulting official requirements.
+- The official harness and sample submission are available in ignored data storage on the owner's machine. Follow docs/BASELINE.md for source versions, validated configuration and evaluator controls; do not invent framework schemas or silently change model IDs. A fresh clone still requires authorized artifact downloads.
 - Maintain TASKS.md and follow experiments/README.md. Record model/backend, split, success rate, time and code version. Establish a single-agent baseline before adding complexity.
 - Keep competition data, reference fixes, restricted source and private logs out of this public repository. Check redistribution permissions before committing imported assets.
 - Setup baseline (2026-10-01): the project started empty. Local Gemini credential loading was verified offline through the central registry; no online authentication, inference, training or official evaluation has been verified.

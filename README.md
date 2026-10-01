@@ -2,13 +2,13 @@
 
 A research workspace for the Kaggle Gemma 4 Developer Agent competition. Build a reproducible baseline, improve repository navigation and test-driven repair, then evaluate whether fine-tuning helps.
 
-**Status:** project scaffolding only. The official harness, dataset and sample submission have not been imported. No online inference, training or competition submission has been run.
+**Status:** the single-agent baseline compiles with the official harness. Real-task evaluator controls pass, and Kaggle submission **56753224** was accepted (initial status: pending). Model score is not yet available. See [the baseline runbook](docs/BASELINE.md).
 
 Continuing in a new local or cloud session? Read [HANDOFF.md](HANDOFF.md) for current context, verification limits and suggested next steps.
 
 ## Quick start
 
-Python 3.12 is sufficient for the current standard-library-only tools:
+Python 3.12 is sufficient for the portable offline checks (the official harness uses Python 3.13; see the runbook):
 
 ```sh
 python tools/check_setup.py
@@ -58,14 +58,14 @@ Use English for shared documentation, code comments, tasks, commits and pull req
 - `docs/PLAN.md`: execution stages, blockers and collaboration workflow; GitHub Issues #1-#5 track status and acceptance criteria.
 - `experiments/`: experiment protocol and results table.
 - `configs/project.json`: public model and endpoint configuration.
-- `submission/`: official harness integration placeholder, not a valid submission.
+- `submission/`: compiled single-agent baseline; package with `tools/package_baseline.py` in the harness environment.
 - `data/`, `models/`, `adapters/`, `runs/`: ignored local artifacts. Reuse existing registered assets where possible.
 
 Do not publish restricted competition data, reference solutions, credentials or private repository contents here.
 
 ## Next milestone
 
-Obtain `HARNESS_README.md` and `sample_submission/` through Kaggle after accepting the competition rules. Confirm the actual schema, hardware, dependencies and redistribution terms before integrating files. Run one public development task, then establish a fixed validation split and baseline.
+Check Kaggle submission 56753224 for completion. Then run a public task through model generation, freeze a validation split, and measure the baseline. The empty/reference-patch controls in [docs/BASELINE.md](docs/BASELINE.md) validate the evaluator, not the agent's accuracy.
 
 ## Sources
 
@@ -74,4 +74,4 @@ Obtain `HARNESS_README.md` and `sample_submission/` through Kaggle after accepti
 - [Rules](https://www.kaggle.com/competitions/gemma-4-developer-agent/rules)
 - [Gemma on Gemini API](https://ai.google.dev/gemma/docs/core/gemma_on_gemini_api)
 
-Competition details were reviewed on October 1, 2026; recheck before submitting.
+Harness details were reviewed on October 2, 2026; recheck rules and quotas before additional submissions.

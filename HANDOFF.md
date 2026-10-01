@@ -6,7 +6,11 @@ Last updated: October 2, 2026 (Australia/Sydney). This is a historical checkpoin
 
 The portable checks and local credential loading pass. Nine isolated tests were added using fake registry fixtures, along with GitHub Actions for Ubuntu/Windows. See the current CI run for remote status. GitHub Issues #1-#5 now hold execution status and docs/PLAN.md contains the implementation plan.
 
-The Kaggle browser remains signed out with files gated by competition-rule acceptance. Docker CLI is installed but the Linux engine is unreachable. The owner subsequently completed Projects authorization. The public [Project board](https://github.com/users/apedintensor/projects/1) is linked to the repository with Todo, In Progress, In Review and Done states. The first-cloud-task suggestion below is historical: tests are now implemented, so do not duplicate that assignment. No live model request, official task or training run has occurred.
+The owner joined the competition and authorized one official Kaggle evaluation. Submission **56753224** was accepted at 2026-10-01 14:45:14 UTC; the latest check remains PENDING with no score. Poll this ID before considering another upload. See [docs/BASELINE.md](docs/BASELINE.md) for the archive hash, exact runtime, evaluator controls and reproduction commands.
+
+The official harness is installed in WSL Ubuntu at `~/.venvs/gemma-baseline` (Python 3.13.15). On rich_2725, the empty-patch control produced 15 passing and 4 failing tests; the reference-patch control passed all 19. These are evaluator checks, not model performance. No local inference, model download or GPU rental occurred. Docker's Linux engine remains unavailable. Official artifacts and private logs are ignored by Git.
+
+The public [Project board](https://github.com/users/apedintensor/projects/1) is linked to the repository. Nine isolated portable tests and Ubuntu/Windows CI already exist; do not duplicate that assignment.
 
 ## Start here
 
@@ -27,7 +31,7 @@ The user wants a practical competition project and is learning how Codex local a
 - Build an agent that navigates Python repositories, fixes issues and submits patches verified by tests.
 - Official required model: `gemma-4-31b-it-qat-w4a16-ct`.
 - Optional Gemini API prototype model: `gemma-4-31b-it`. Preserve both exact IDs and distinguish their results.
-- Official submissions use an ADK-based configuration package with agent.yaml at the archive root. LoRA is optional. Do not invent the full schema before obtaining the official sample.
+- Official submissions use an ADK-based configuration package with agent.yaml at the archive root. LoRA is optional. The authored single-agent package has passed the official compiler; see submission/.
 - Strategy: establish a single-agent baseline, inspect failures, improve retrieval/test feedback/time allocation, then decide whether SFT/LoRA or RL is justified.
 
 ## What has actually been completed
@@ -38,7 +42,7 @@ The user wants a practical competition project and is learning how Codex local a
 - Default tools/check_setup.py validates public configuration offline using the Python standard library. Verified from a clean temporary copy without local configuration.
 - Optional --check-registry and --check-credentials reuse the existing central loader on the owner's machine. The selected local Gemini profile loaded successfully in memory; no API request was made.
 - Owner-specific registry paths and explicit profile selection remain in ignored configs/local.json. Do not print, publish or overwrite them unnecessarily.
-- No model downloads, GPU provisioning, inference, training or Kaggle submission have occurred.
+- An authored single-agent package compiled successfully and was submitted to Kaggle; model evaluation remains pending. No local inference, model weights download, GPU provisioning or training occurred.
 
 ## Cloud environment evidence and limits
 
@@ -46,7 +50,7 @@ The user supplied a setup screenshot showing Python 3.12.14 installed and `pytho
 
 An environment is a reusable prepared setup: selected repositories, tools, dependencies and access configuration. A new cloud task uses its own workspace based on the published setup. Continuing an existing task keeps that task's state. Publishing an environment update does not automatically replace existing tasks' state.
 
-Local and cloud do not share the same folder. The local central registry and Windows-bound encrypted credential vault are not automatically available in cloud tasks. The project currently has no cloud API credential adapter or online agent implementation. A passing offline check does not establish provider access or official harness readiness.
+Local and cloud do not share the same folder. The local central registry and Windows-bound encrypted credential vault are not automatically available in cloud tasks. The project currently has no cloud API credential adapter; local model inference has not been verified. A passing offline check does not establish provider access or official harness readiness.
 
 ## Why use Cloud for this project?
 
@@ -61,13 +65,9 @@ Cloud is optional. Its likely value here is independent coding work that can con
 
 Do not migrate everything merely because a cloud environment exists. A sensible first comparison is one small cloud coding task, reviewed locally. If it adds little value, continue local development.
 
-## Suggested first cloud task
+## Possible future cloud work
 
-This is a future suggestion, not an instruction to dispatch another task without user authorization:
-
-> Read AGENTS.md, README.md and HANDOFF.md. Add standard-library unit tests for tools/check_setup.py covering a fresh clone without local configuration and rejection of unexpected model IDs or endpoints. Use temporary fixtures and fake registry metadata only; do not load real credentials or access the network. Keep production model IDs unchanged. Run the tests, document the command and prepare a focused pull request. Report in English.
-
-Use a separate branch. Avoid concurrently changing the same files locally. Review the diff and checks before merging. A new session should verify that its checkout contains this handoff; an older cloud task may need an explicit repository update. Preserve uncommitted work when synchronizing.
+Portable setup tests are already implemented. Choose a small issue from TASKS.md before dispatching additional work, and use a separate branch. A new session should inspect current Git state and avoid duplicating local changes. No cloud task was dispatched for this baseline.
 
 ## Collaboration workflow
 
@@ -77,10 +77,10 @@ Typical cycle: local commit/push -> cloud task on a branch -> review/merge PR ->
 
 ## Next competition milestone and blockers
 
-1. Obtain the official HARNESS_README.md and sample_submission through Kaggle after the user accepts the competition rules. Prior browsing could read the public description but not gated files. Do not claim the rules have been accepted.
-2. Check hardware, dependencies, context and time budgets, tools, LoRA compatibility, and redistribution permissions.
-3. Build the documented environment and run one public development task end to end.
-4. Fix development/validation splits and record the first official-harness baseline before adding complexity.
+1. Check Kaggle submission 56753224 for its actual terminal result and score.
+2. Inspect available error/score evidence before changing the baseline.
+3. For detailed public-task agent trajectories, obtain suitable compute with a concrete budget before rental; the existing local GPU cannot run the official serving configuration unchanged.
+4. Freeze development/validation splits before tuning prompts or training. The rich_2725 reference-patch control is not held-out evidence.
 
 The competition overview previously reported 129 public development tasks, about 120 hidden tasks, a 12-hour total patch-generation budget, one submission per day and up to five team members. These are dated research notes; recheck official rules before relying on them. Collaboration must comply with competition team/sharing rules. Keep restricted tasks, reference fixes and private code out of this public repository; check permissions before importing official materials.
 
