@@ -6,6 +6,10 @@ must not be reported as an official competition score.
 
 Measured outcome: see [API_RESULTS.md](API_RESULTS.md) for final usage, cost estimate and all ten task outcomes.
 
+The October 3 single-task follow-up is documented in
+[ITERATION_RESULTS.md](ITERATION_RESULTS.md). Follow [ITERATION.md](ITERATION.md)
+for scoped baseline/candidate comparisons.
+
 ## Frozen selection and configuration
 
 The ten IDs in `experiments/api-diagnostic-10-v1.json` were selected before model
@@ -20,12 +24,19 @@ storage and explicitly selects the API prototype model. The original submission
 and both configured model IDs remain unchanged. Sampling is temperature 0.2,
 top-p 0.95 and 16,384 maximum output tokens. The API supports Gemma thinking as
 on/off, so the adapter requests `thinking_level=high` rather than the submitted
-4,096-token thinking budget. Each task has four minutes, 50 tool calls, 80 turns
-and a 120-second command timeout. The account reported a 16,000 input-token-per-minute limit. The adapter uses
+4,096-token thinking budget. Since October 3, 2026, the local API runner has no
+per-task wall-clock limit. It explicitly sets `EvaluationBudget(time_minutes=None)`;
+omitting the flat timeout alone would restore the harness's 60-minute default,
+and zero would immediately time out. Each task still has 50 tool calls, 80 turns
+and a 120-second command timeout. This is an API-only override: the official
+submission configuration and already-uploaded archive retain their original
+four-minute limit. Historical API runs also retain their original budgets and
+results. The account reported a 16,000 input-token-per-minute limit. The adapter uses
 countTokens on a conservative serialized request and admits at most 15,500
 estimated tokens in a rolling 65-second window. Requests exceeding that ceiling
 end the task with an explicit local quota-stop record and retain any existing
-patch. Rate-limit waiting consumes the task's elapsed-time budget.
+patch. Rate-limit waiting is included in measured elapsed time but no longer
+triggers a per-task session timeout in the local API runner.
 
 ## Runtime
 
@@ -56,6 +67,14 @@ included in model requests.
 python tools/summarize_api_run.py runs/unique-api-run
 ```
 
+For one task, add `--task-id httpx_3672`; `--submission-dir` selects a baseline or
+candidate directory to snapshot. Record the predeclared change with `--hypothesis`
+and the comparison run with `--parent-run`. The finalized launcher saves its
+source files, exact package versions (including the task dependency overlay),
+task-data hashes, submission hashes and Git revision in each private run.
+Use `python tools/iteration_report.py runs/unique-api-run --record` after completion
+to save the aggregate report and append the experiment ledger idempotently.
+
 The runner deliberately rejects an existing output directory. Download all ten
 authorized repository snapshots before invoking it. A fresh clone also needs
 the official harness wheels and local registry access; this is not a portable
@@ -64,7 +83,11 @@ credential-free CI command.
 ## Usage and cost accounting
 
 `usage.jsonl` contains provider-returned token counts, latency and sanitized API
-errors without prompts or keys. `summary.json` records per-task results. Patches,
+errors without prompts or keys. `summary.json` records per-task results.
+`evaluation-config.json` records the effective runner limits, with `null` meaning
+no per-task wall-clock limit. The frozen selection file also documents the original
+four-minute experiment; the runner uses its task IDs, not those historical limits.
+Patches,
 task traces and detailed test output stay in ignored run directories.
 
 Prompt tokens already include cached prompt tokens; do not add cache counts to

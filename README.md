@@ -6,6 +6,11 @@ A research workspace for the Kaggle Gemma 4 Developer Agent competition. Build a
 
 **API diagnostic:** ten public tasks completed through `gemma-4-31b-it`: 386,983 tokens, 41.5 minutes, 0/10 resolved under the four-minute task budget and account rate limit. Published-rate cost estimate: US$0; see [the measured result and limitations](docs/API_RESULTS.md). This is separate from the pending Kaggle submission.
 
+**Iteration checkpoint (October 3):** one task rerun without a session deadline
+used 56,436 tokens and stopped at the local input-quota guard before producing a
+patch. See [the diagnosis](docs/ITERATION_RESULTS.md) and the repeatable
+[prompt iteration workflow](docs/ITERATION.md).
+
 Continuing in a new local or cloud session? Read [HANDOFF.md](HANDOFF.md) for current context, verification limits and suggested next steps.
 
 ## Quick start
@@ -59,6 +64,7 @@ Use English for shared documentation, code comments, tasks, commits and pull req
 - `TASKS.md`: task board and acceptance criteria.
 - `docs/PLAN.md`: execution stages, blockers and collaboration workflow; GitHub Issues #1-#5 track status and acceptance criteria.
 - `experiments/`: experiment protocol and results table.
+- `tools/iteration_report.py`: offline run reporting, controlled comparisons and ledger recording.
 - `configs/project.json`: public model and endpoint configuration.
 - `submission/`: compiled single-agent baseline; package with `tools/package_baseline.py` in the harness environment.
 - `data/`, `models/`, `adapters/`, `runs/`: ignored local artifacts. Reuse existing registered assets where possible.

@@ -2,6 +2,11 @@
 
 Use a unique run_id and add a row to results.csv for each actual run. Keep detailed logs in ignored runs/<run_id>/. Never record credentials or full environment dumps.
 
+Follow [the iteration workflow](../docs/ITERATION.md) for scoped prompt experiments.
+Use `tools/iteration_report.py` to summarize a run, compare a candidate with a
+baseline, and record completed outcomes without copying private traces into the
+public ledger. `iteration-template.json` is the cycle decision template.
+
 Record Git commit, exact model ID, backend (ai_studio or official_harness), fixed dataset split version, attempted/solved counts, success rate, wall time, configuration and log paths. Success rate is solved/attempted; include timeouts, missing patches and execution failures in the predeclared denominator. Leave unknown cost blank, not zero.
 
 Preserve sampling parameters, seed when supported, prompt/tool versions, adapter version/path, and hardware/software versions in each run's configuration. Compare prototype and official-harness results separately.

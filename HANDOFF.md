@@ -1,6 +1,27 @@
 # Session handoff
 
-Last updated: October 2, 2026 (Australia/Sydney). This is a historical checkpoint; inspect current files and Git state before making changes.
+Last updated: October 3, 2026 (Australia/Sydney). This is a historical checkpoint; inspect current files and Git state before making changes.
+
+## October 3 configuration update
+
+The owner then requested one task and a reusable iteration process. Run
+`api-iter-001-httpx3672-20261003` is complete: 0/1 resolved, no patch, 322.7 seconds,
+56,436 recorded tokens and seven real generation responses. The local adapter
+stopped when its conservative input estimate reached 16,501 tokens, above its
+15,500-token quota guard. There were no provider errors; 210.3 recorded seconds
+were pacing waits. This is an operational stop, not a failed candidate patch.
+See docs/ITERATION_RESULTS.md, docs/ITERATION.md and tools/iteration_report.py.
+The run source and submission are frozen privately; subsequent automatic
+fingerprint collection changed the launcher hash but not inference behavior.
+Preserve the original hash and review this difference before comparisons. No
+second experiment or additional Kaggle submission was started.
+
+At the owner's request, the local API runner now uses an explicit
+`EvaluationBudget(time_minutes=None)` to remove its four-minute per-task session
+limit. The 50-tool-call, 80-turn and 120-second command limits remain. Future runs
+write their effective limits to `evaluation-config.json`. Historical results and
+the official submission configuration remain unchanged. The timeout edit itself
+started no inference; the authorized one-task follow-up is described above.
 
 ## Latest API checkpoint
 

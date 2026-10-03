@@ -4,6 +4,13 @@ GitHub Issues are the source of truth for task status, ownership and acceptance 
 
 See [docs/PLAN.md](docs/PLAN.md) for the evidence-based execution plan.
 
+October 3, 2026: removed the local API diagnostic's four-minute session limit and
+completed one `httpx_3672` run: no patch before the local input-quota guard stopped
+generation. The repeatable workflow, run snapshots, comparison tool and ledger
+recording are ready. See [the result](docs/ITERATION_RESULTS.md) and
+[iteration protocol](docs/ITERATION.md). Next development experiment: focused
+reads to reduce context growth; official-model milestone #3 remains open.
+
 | Order | Milestone | Issue | Dependency |
 |---|---|---|---|
 | 0 | Portable checks and cross-platform CI | [#1](https://github.com/apedintensor/gemma-developer-agent/issues/1) | None |
