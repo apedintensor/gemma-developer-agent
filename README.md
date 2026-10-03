@@ -5,6 +5,9 @@ A research workspace for the Kaggle Gemma 4 Developer Agent competition. Build a
 **Current API backend:** OpenRouter `google/gemma-4-31b-it`, pinned to
 `deepinfra/fp8`. See [configuration, limits and verification](docs/OPENROUTER.md).
 Select `--backend ai_studio` to reproduce the earlier API route.
+The first unchanged-prompt development task passed local official verification:
+24 tests passed, 11m54s, 754,375 tokens and US$0.11580450 reported cost. Its input
+grew beyond the official context limit, so this is prototype evidence only.
 
 **Status:** the single-agent baseline compiles with the official harness. Real-task evaluator controls pass, and Kaggle submission **56753224** was accepted (initial status: pending). Model score is not yet available. See [the baseline runbook](docs/BASELINE.md).
 

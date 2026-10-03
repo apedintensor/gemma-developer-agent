@@ -287,6 +287,16 @@ class OpenRouterGemma(BaseLlm):
     _path: Path = PrivateAttr()
     _stop_reasons: dict = PrivateAttr(default_factory=dict)
 
+    def model_copy(self, *, update=None, deep=False):
+        """Clone configuration while sharing the owned transport and usage ledger.
+
+        The official compiler asks for a deep copy. SDK clients own connection
+        pools and locks that cannot be deep-copied. All public fields here are
+        immutable configuration; private transport/metering state intentionally
+        stays shared. The task label is copied at compilation time.
+        """
+        return super().model_copy(update=update, deep=False)
+
     def _write(self, record):
         with self._path.open('a', encoding='utf-8') as handle:
             handle.write(_json(record) + '\n')

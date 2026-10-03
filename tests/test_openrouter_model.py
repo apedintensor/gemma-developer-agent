@@ -1,8 +1,10 @@
 """Offline transport contract tests; optional SDKs are needed only in the WSL harness."""
 
 import importlib.util
+import gc
 import json
 from pathlib import Path
+import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
@@ -239,6 +241,28 @@ class OpenRouterTransportTests(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(ValueError):
             adapter.create_openrouter_model(api_key='fake-secret', base_url='https://other.example/v1',
                                             usage_path=self.path)
+
+    async def test_official_compiler_copy_shares_sdk_transport_and_metering_without_destructor_error(self):
+        from adk_submission.resolvers.models import _clone_model
+        model = adapter.create_openrouter_model(api_key='offline-placeholder-not-a-credential',
+            base_url=adapter.BASE_URL, usage_path=self.path)
+        model._task = 'task-at-compilation'
+        unraisable = []
+        try:
+            with patch.object(sys, 'unraisablehook', lambda event: unraisable.append(type(event.exc_value).__name__)):
+                cloned = _clone_model(model)
+                gc.collect()
+            self.assertIsNot(cloned, model)
+            self.assertIs(cloned._client, model._client)
+            self.assertIs(cloned._records, model._records)
+            self.assertIs(cloned._stop_reasons, model._stop_reasons)
+            cloned._records.append({'offline_sentinel': True})
+            self.assertEqual(model._records, [{'offline_sentinel': True}])
+            model._task = 'next-task'
+            self.assertEqual(cloned._task, 'task-at-compilation')
+            self.assertEqual(unraisable, [])
+        finally:
+            await model.aclose()
 
 
 if __name__ == '__main__':

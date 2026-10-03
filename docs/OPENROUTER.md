@@ -61,6 +61,46 @@ tool declarations when tools are disabled while preserving complete prior tool
 history and reasoning state. This does not change normal agent AUTO tool mode.
 A public metadata lookup alone verifies only the published route description.
 
+## First complete task result
+
+Run `or-iter-001-httpx3672-20261004` used the unchanged baseline prompt on
+the existing development task `httpx_3672`. The local official verifier resolved
+the task with exit code 0 and 24 tests passing. It took 713.592 seconds, 34 model
+responses and 32 tool calls, with no API errors or quota stops.
+
+| Recorded metric | Value |
+|---|---:|
+| Input tokens | 743,782 |
+| Visible output tokens | 4,244 |
+| Reasoning tokens | 6,349 |
+| Total tokens | 754,375 |
+| Cached input tokens | 0 |
+| Response-reported task cost | US$0.11580450 |
+| Task plus successful setup-response costs | US$0.11593180 |
+| Largest single input | 32,936 tokens |
+
+All task responses identify DeepInfra and `google/gemma-4-31b-it`. Costs are
+recorded provider metadata, not a reconciled invoice; rejected setup requests
+did not return usage/cost metadata. Full raw traces and the generated patch stay
+in ignored `runs/`; the public ledger contains only aggregate metrics.
+
+The largest input alone exceeded the competition's 32,768-token total context
+window. This result therefore does not establish feasibility under official
+context limits, official-model accuracy, or generalization beyond one development
+task. No prompt change or training produced this result. A later experiment
+should enforce/compact to a declared context budget before making competition
+claims. The generated patch also retained a scratch reproduction script; note
+that cleanup issue for a separate prompt experiment, without altering this result.
+
+The run froze source revision `2c4bb0d814cc4ce1d81601ae9f32c91b6ea035f6`
+with a working-tree marker and exact source/artifact hashes in its manifest.
+The initial SDK model clone emitted a nonfatal destructor warning while the
+compiler fell back to a shallow copy. An offline check confirmed shared metering
+and transport. A subsequent explicit copy implementation removes that warning;
+its 13 adapter tests pass, including the real official compiler with a fake key.
+The frozen run source was preserved. The adapter hash now differs, so do not
+silently attribute a future comparison to prompt changes alone.
+
 ## Run one task
 
 Use the existing WSL harness environment and local prerequisites described in
