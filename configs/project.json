@@ -1,10 +1,17 @@
 {
   "competition_slug": "gemma-4-developer-agent",
   "competition_model": "gemma-4-31b-it-qat-w4a16-ct",
+  "default_backend": "openrouter",
   "prototype": {
     "service": "gemini",
     "model": "gemma-4-31b-it",
     "base_url": "https://generativelanguage.googleapis.com",
     "protocol": "gemini_generate_content"
+  },
+  "openrouter_prototype": {
+    "service": "openrouter",
+    "model": "google/gemma-4-31b-it",
+    "base_url": "https://openrouter.ai/api/v1",
+    "protocol": "openai_chat_completions"
   }
 }

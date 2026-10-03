@@ -5,7 +5,17 @@ change one factor, rerun, then keep or revert. The current development task is
 `httpx_3672`. It has working local evaluator controls, but tuning on this task
 makes its result development evidence, not a generalization claim.
 
-## Fixed conditions
+## Current backend
+
+New local runs default to OpenRouter `google/gemma-4-31b-it`, pinned to
+`deepinfra/fp8`; see [OPENROUTER.md](OPENROUTER.md). Establish a fresh baseline
+on this backend. The AI Studio results and commands below are historical
+reproduction examples; they explicitly select `--backend ai_studio`.
+OpenRouter records actual provider routing and response-reported cost, without
+the AI Studio 65-second pacing window. Its context is not yet capped to the
+competition's 32,768 tokens, so treat its results as prototype development.
+
+## Historical AI Studio fixed conditions
 
 - API prototype: `gemma-4-31b-it`, backend `ai_studio`, existing central Gemini
   profile. The official submission remains `gemma-4-31b-it-qat-w4a16-ct`.
@@ -25,7 +35,7 @@ makes its result development evidence, not a generalization claim.
 2. Run the unmodified baseline from the project root in WSL:
 
    ```sh
-   ~/.venvs/gemma-baseline/bin/python tools/run_api_baseline.py --task-id httpx_3672 --submission-dir submission --run-id api-iter-001-httpx3672-20261003 --hypothesis "Establish the original-prompt baseline without a wall-clock limit."
+   ~/.venvs/gemma-baseline/bin/python tools/run_api_baseline.py --backend ai_studio --task-id httpx_3672 --submission-dir submission --run-id api-iter-001-httpx3672-20261003 --hypothesis "Establish the original-prompt baseline without a wall-clock limit."
    python tools/iteration_report.py runs/api-iter-001-httpx3672-20261003 --record
    ```
 
@@ -47,7 +57,7 @@ makes its result development evidence, not a generalization claim.
 5. Run the candidate with the same task and settings:
 
    ```sh
-   ~/.venvs/gemma-baseline/bin/python tools/run_api_baseline.py --task-id httpx_3672 --submission-dir runs/iteration-candidates/httpx-p01 --run-id api-iter-002-httpx3672-20261003 --parent-run api-iter-001-httpx3672-20261003 --hypothesis "REPLACE_WITH_THE_OBSERVED_FAILURE_AND_ONE_EXPECTED_CHANGE"
+   ~/.venvs/gemma-baseline/bin/python tools/run_api_baseline.py --backend ai_studio --task-id httpx_3672 --submission-dir runs/iteration-candidates/httpx-p01 --run-id api-iter-002-httpx3672-20261003 --parent-run api-iter-001-httpx3672-20261003 --hypothesis "REPLACE_WITH_THE_OBSERVED_FAILURE_AND_ONE_EXPECTED_CHANGE"
    python tools/iteration_report.py runs/api-iter-002-httpx3672-20261003 --compare runs/api-iter-001-httpx3672-20261003 --record
    ```
 

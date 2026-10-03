@@ -2,6 +2,10 @@
 
 A research workspace for the Kaggle Gemma 4 Developer Agent competition. Build a reproducible baseline, improve repository navigation and test-driven repair, then evaluate whether fine-tuning helps.
 
+**Current API backend:** OpenRouter `google/gemma-4-31b-it`, pinned to
+`deepinfra/fp8`. See [configuration, limits and verification](docs/OPENROUTER.md).
+Select `--backend ai_studio` to reproduce the earlier API route.
+
 **Status:** the single-agent baseline compiles with the official harness. Real-task evaluator controls pass, and Kaggle submission **56753224** was accepted (initial status: pending). Model score is not yet available. See [the baseline runbook](docs/BASELINE.md).
 
 **API diagnostic:** ten public tasks completed through `gemma-4-31b-it`: 386,983 tokens, 41.5 minutes, 0/10 resolved under the four-minute task budget and account rate limit. Published-rate cost estimate: US$0; see [the measured result and limitations](docs/API_RESULTS.md). This is separate from the pending Kaggle submission.
@@ -40,13 +44,14 @@ Suggested setup prompt:
 ## Models
 
 - Official competition model: `gemma-4-31b-it-qat-w4a16-ct`.
+- Default local API prototype: `google/gemma-4-31b-it` through OpenRouter.
 - Optional AI Studio prototype model: `gemma-4-31b-it` using the Gemini API.
 - These backends are separate; prototype results are not official benchmark results.
 - GPU providers are not provisioned by this repository.
 
 ## Local central registry integration
 
-Existing local credentials remain in the central encrypted registry. Do not copy them into this repository. Create an ignored `configs/local.json` containing only `registry_windows`, `registry_wsl` and an explicitly matched `profile`, or set `AI_REGISTRY_ROOT` and `AI_REGISTRY_PROFILE`.
+Existing local credentials remain in the central encrypted registry. Do not copy them into this repository. Create an ignored `configs/local.json` containing `registry_windows`, `registry_wsl`, an explicitly matched `openrouter_profile` and, for AI Studio, `profile`; or set `AI_REGISTRY_ROOT` and `AI_REGISTRY_PROFILE`.
 
 ```sh
 python tools/check_setup.py --check-registry

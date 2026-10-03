@@ -12,6 +12,7 @@ import hashlib
 from importlib.metadata import distributions, version
 import json
 import logging
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -131,12 +132,37 @@ async def run(args, cleanup):
     submission_source = (root / args.submission_dir).resolve()
     if not (submission_source / 'agent.yaml').is_file():
         raise ValueError('Submission directory must contain agent.yaml')
+    settings = json.loads((root / 'configs/project.json').read_text())
+    backend = args.backend or settings.get('default_backend', 'ai_studio')
+    prototype = settings['openrouter_prototype' if backend == 'openrouter' else 'prototype']
+    model_id = prototype['model']
     local = json.loads((root / 'configs/local.json').read_text())
-    sys.path.insert(0, local['registry_wsl'])
+    registry_root = os.environ.get('AI_REGISTRY_ROOT') or local['registry_wsl']
+    profile = os.environ.get('AI_REGISTRY_PROFILE') or local[
+        'openrouter_profile' if backend == 'openrouter' else 'profile']
+    sys.path.insert(0, registry_root)
     from api_registry import load_api
-    credential = load_api('gemini', profile=local['profile'])
-    if credential.base_url.rstrip('/') != 'https://generativelanguage.googleapis.com':
-        raise ValueError('Unexpected central Gemini endpoint')
+    credential = load_api(prototype['service'], profile=profile)
+    if not credential.api_key or credential.base_url != prototype['base_url']:
+        raise ValueError('Central credential or endpoint does not match the selected backend')
+    provider_config = None
+    reasoning_config = {'thinking_level': 'high', 'include_thoughts': True}
+    pacing = {'estimated_input_tokens': 15500, 'window_seconds': 65}
+    source_names = ['run_api_baseline.py', 'api_sandbox.py']
+    if backend == 'openrouter':
+        from openrouter_model import (
+            BASE_URL, MODEL_ID, PROVIDER_CONFIG, REASONING_CONFIG,
+            create_openrouter_model,
+        )
+        if model_id != MODEL_ID or prototype['base_url'] != BASE_URL:
+            raise ValueError('Unexpected OpenRouter model or endpoint')
+        provider_config = PROVIDER_CONFIG
+        reasoning_config = REASONING_CONFIG
+        pacing = {'mode': 'provider_managed', 'estimated_input_tokens': None,
+                  'window_seconds': None, 'automatic_retries': 0}
+        source_names.append('openrouter_model.py')
+    elif model_id != 'gemma-4-31b-it' or prototype['base_url'] != 'https://generativelanguage.googleapis.com':
+        raise ValueError('Unexpected AI Studio model or endpoint')
     install_isolation(Path(args.bwrap).expanduser())
     check_isolation()
     output = root / 'runs' / args.run_id
@@ -144,7 +170,7 @@ async def run(args, cleanup):
     submission = output / 'submission'
     shutil.copytree(submission_source, submission)
     yaml = submission / 'agent.yaml'
-    yaml.write_text(yaml.read_text().replace('gemma-4-31b-it-qat-w4a16-ct', 'gemma-4-31b-it'))
+    yaml.write_text(yaml.read_text().replace('gemma-4-31b-it-qat-w4a16-ct', model_id))
     (output / 'selection.json').write_text(json.dumps(selected, indent=2))
     commit = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=root, check=True,
                             capture_output=True, text=True).stdout.strip()
@@ -153,7 +179,7 @@ async def run(args, cleanup):
     source_dir = output / 'source'
     source_dir.mkdir()
     source_hashes = {}
-    for name in ['run_api_baseline.py', 'api_sandbox.py']:
+    for name in source_names:
         payload = (root / 'tools' / name).read_bytes()
         (source_dir / name).write_bytes(payload)
         source_hashes['tools/' + name] = hashlib.sha256(payload).hexdigest()
@@ -173,7 +199,7 @@ async def run(args, cleanup):
         'run_id': args.run_id,
         'started_at': datetime.now(ZoneInfo('Australia/Sydney')).isoformat(),
         'git_commit': ('working-tree:' if dirty else '') + commit,
-        'backend': 'ai_studio', 'model_id': 'gemma-4-31b-it',
+        'backend': backend, 'model_id': model_id,
         'split_version': split_version, 'task_ids': [item['id'] for item in selected],
         'source_sha256': source_hashes,
         'artifact_sha256': artifacts,
@@ -181,21 +207,31 @@ async def run(args, cleanup):
         'submission_sha256': {str(p.relative_to(submission)): hashlib.sha256(p.read_bytes()).hexdigest()
                               for p in sorted(submission.rglob('*')) if p.is_file()},
         'runtime': {'python': sys.version.split()[0], **{name: version(name) for name in
-                    ['swegemma', 'adk-submission', 'adk-eval-core', 'google-adk', 'google-genai']}},
+                    ['swegemma', 'adk-submission', 'adk-eval-core', 'google-adk', 'google-genai']
+                    + (['openai'] if backend == 'openrouter' else [])}},
         'sandbox': 'subprocess+bubblewrap',
-        'pacing': {'estimated_input_tokens': 15500, 'window_seconds': 65},
+        'pacing': pacing,
+        'provider_config': provider_config,
+        'reasoning_config': reasoning_config,
+        'local_context_cap': None,
+        'official_context_window': 32768,
         'hypothesis': args.hypothesis, 'parent_run': args.parent_run,
     }
     (output / 'manifest.json').write_text(json.dumps(manifest, indent=2))
-    model = MeteredGemma(model='gemma-4-31b-it')
-    model._key = credential.api_key
-    model._client = genai.Client(api_key=credential.api_key, vertexai=False,
-        http_options=types.HttpOptions(base_url=credential.base_url, timeout=90000,
-            retry_options=types.HttpRetryOptions(attempts=1)))
-    cleanup.push_async_callback(model._client.aio.aclose)
-    model._path = output / 'usage.jsonl'
+    if backend == 'openrouter':
+        model = create_openrouter_model(api_key=credential.api_key,
+            base_url=credential.base_url, usage_path=output / 'usage.jsonl')
+        cleanup.push_async_callback(model.aclose)
+    else:
+        model = MeteredGemma(model=model_id)
+        model._key = credential.api_key
+        model._client = genai.Client(api_key=credential.api_key, vertexai=False,
+            http_options=types.HttpOptions(base_url=credential.base_url, timeout=90000,
+                retry_options=types.HttpRetryOptions(attempts=1)))
+        cleanup.push_async_callback(model._client.aio.aclose)
+        model._path = output / 'usage.jsonl'
     registry = ModelRegistry()
-    registry.register('gemma-4-31b-it', model)
+    registry.register(model_id, model)
     tasks = {t.instance_id: t for t in load_tasks(root / 'data/official/tasks.jsonl')}
     summaries = []
     for index, item in enumerate(selected, 1):
@@ -242,6 +278,8 @@ async def run(args, cleanup):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--selection', default='experiments/api-diagnostic-10-v1.json')
+    parser.add_argument('--backend', choices=['ai_studio', 'openrouter'],
+                        help='Prototype backend; defaults to configs/project.json')
     parser.add_argument('--run-id', required=True)
     parser.add_argument('--task-id', help='Run only this ID from the frozen selection')
     parser.add_argument('--submission-dir', default='submission', help='Agent configuration to snapshot for this run')
