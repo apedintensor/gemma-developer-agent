@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "cycle_id": "REPLACE_WITH_UNIQUE_CYCLE_ID",
+  "status": "planned",
+  "scope": "Current invocation: one development-task baseline. Future scoped batches may iterate autonomously within their declared limits.",
+  "development_task_ids": ["httpx_3672"],
+  "split_role": "development; not held-out validation",
+  "backend": "ai_studio",
+  "model_id": "gemma-4-31b-it",
+  "official_model_id_for_separate_confirmation": "gemma-4-31b-it-qat-w4a16-ct",
+  "fixed_conditions": {
+    "max_time_minutes": null,
+    "null_time_semantics": "No local per-task wall-clock limit; other stops remain active.",
+    "max_tool_calls": 50,
+    "max_turns": 80,
+    "command_timeout_seconds": 120,
+    "temperature": 0.2,
+    "top_p": 0.95,
+    "max_output_tokens": 16384,
+    "thinking_level": "high",
+    "task_snapshot_hashes_path": null,
+    "dependency_snapshot_path": null
+  },
+  "baseline": {
+    "run_id": null,
+    "source_submission_dir": "submission",
+    "git_commit": null,
+    "manifest_path": null,
+    "result_summary_path": null
+  },
+  "diagnosis": {
+    "failure_category": null,
+    "observation": null,
+    "evidence_paths": [],
+    "reference_fixes_used_for_prompt_design": false,
+    "environment_valid_for_comparison": null
+  },
+  "hypothesis": null,
+  "one_changed_factor": null,
+  "expected_signal": null,
+  "candidate": {
+    "run_id": null,
+    "source_submission_dir": null,
+    "git_commit": null,
+    "manifest_path": null,
+    "result_summary_path": null
+  },
+  "comparison": {
+    "fixed_conditions_match": null,
+    "baseline_resolved": null,
+    "candidate_resolved": null,
+    "baseline_tool_calls": null,
+    "candidate_tool_calls": null,
+    "baseline_wall_seconds": null,
+    "candidate_wall_seconds": null,
+    "baseline_total_tokens": null,
+    "candidate_total_tokens": null,
+    "actual_cost_usd": null,
+    "published_rate_estimate_usd": null,
+    "pricing_source_and_date": null,
+    "decision": null,
+    "allowed_decisions": ["keep_provisionally", "revert", "inconclusive"],
+    "rationale": null
+  },
+  "stop_rules": {
+    "max_iterations": 1,
+    "max_iterations_semantics": "Planned model runs for this invocation, including the baseline; configure explicitly before a future batch.",
+    "max_consecutive_no_gain_iterations": 2,
+    "max_repeated_quota_or_environment_failures": 1,
+    "scheduled_or_indefinite_loop_enabled": false,
+    "authorized_usage_or_spending_budget": null,
+    "retry_policy": "No automatic retries in the current invocation; declare any future batch retry policy before execution.",
+    "on_api_or_environment_error": "Stop and diagnose; preserve explicitly selected model, provider, task scope and budget.",
+    "on_quota_context_or_harness_budget_stop": "Retain the incomplete attempt and count it in the declared denominator.",
+    "development_success": "Official verifier resolves the task under the frozen conditions.",
+    "generalization_claim": "Requires a predeclared comparison on additional tasks; one tuned task is insufficient."
+  },
+  "next_validation": {
+    "frozen_regression_task_ids": [],
+    "uninspected_validation_task_ids": [],
+    "ids_declared_before_execution": null,
+    "official_model_confirmation_run_id": null
+  },
+  "notes": "Copy this template into ignored run storage. Preserve completed snapshots and all failures. Do not include secrets, reference fixes or restricted task contents in public records."
+}
