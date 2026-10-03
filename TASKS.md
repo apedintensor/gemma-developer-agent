@@ -4,6 +4,15 @@ GitHub Issues are the source of truth for task status, ownership and acceptance 
 
 See [docs/PLAN.md](docs/PLAN.md) for the evidence-based execution plan.
 
+October 4, 2026: the owner selected paid OpenRouter for local development.
+The model/tool adapter, explicit central profile, pinned provider and response
+cost accounting are implemented. Authentication and the synthetic tool-result
+roundtrip pass. One unchanged-prompt `httpx_3672` run then resolved the task:
+24 tests passed, 713.6 seconds, US$0.11580450 response-reported cost. Its largest
+input (32,936 tokens) exceeds the official total context window, so the
+official-model milestone remains separate. See
+[OpenRouter setup and verification](docs/OPENROUTER.md).
+
 October 3, 2026: removed the local API diagnostic's four-minute session limit and
 completed one `httpx_3672` run: no patch before the local input-quota guard stopped
 generation. The repeatable workflow, run snapshots, comparison tool and ledger

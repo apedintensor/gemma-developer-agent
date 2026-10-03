@@ -90,7 +90,7 @@ def build_report(directory):
             warnings.append(f'{key} metadata is missing.')
     if not isinstance(manifest.get('pacing'), dict):
         warnings.append('Structured pacing settings are unavailable.')
-    elif not {'estimated_input_tokens', 'window_seconds'} <= manifest['pacing'].keys():
+    elif backend == 'ai_studio' and not {'estimated_input_tokens', 'window_seconds'} <= manifest['pacing'].keys():
         warnings.append('Structured pacing settings are incomplete.')
     fingerprints = {
         'sandbox_source': file_hash(manifest, 'source_sha256', 'tools/api_sandbox.py'),
@@ -99,6 +99,8 @@ def build_report(directory):
         'artifacts': manifest.get('artifact_sha256'),
         'dependencies': manifest.get('dependency_sha256'),
     }
+    if backend == 'openrouter':
+        fingerprints['openrouter_adapter'] = file_hash(manifest, 'source_sha256', 'tools/openrouter_model.py')
     for key, value in fingerprints.items():
         if not value:
             warnings.append(f'{key} fingerprint is unknown; protocol equivalence cannot be established.')
@@ -106,6 +108,25 @@ def build_report(directory):
 
     tokens = {key: sum(number((row.get('usage') or {}).get(key)) for row in usage) for key in TOKEN_FIELDS}
     successful = [row for row in usage if not row.get('error_type') and 'usage' in row]
+    reported_costs = [number(row['cost_usd']) for row in successful if row.get('cost_usd') is not None]
+    cost_complete = bool(successful) and len(reported_costs) == len(successful)
+    known_cost = math.fsum(reported_costs) if reported_costs else None
+    providers = sorted({row['provider'] for row in successful if row.get('provider')})
+    response_models = sorted({row['model_version'] for row in successful if row.get('model_version')})
+    provider_config = manifest.get('provider_config')
+    routing_missing = sum(not row.get('provider') or not row.get('model_version') for row in successful)
+    if backend == 'openrouter':
+        routing_issues = []
+        if not isinstance(provider_config, dict):
+            routing_issues.append('OpenRouter provider configuration is unknown.')
+        if not successful or routing_missing:
+            routing_issues.append('Actual OpenRouter provider/model routing is incomplete or unknown.')
+        if len(providers) > 1 or len(response_models) > 1:
+            routing_issues.append('Multiple actual providers or response models were used; dynamic routing prevents prompt-only attribution.')
+        warnings.extend(routing_issues)
+        blockers.extend(routing_issues)
+        if not cost_complete:
+            warnings.append('Provider-reported costs are incomplete; the known subtotal is not a complete run cost.')
     timing_sources = {'pacing_wait_seconds': 'pacing_wait_seconds',
                       'count_tokens_seconds': 'count_tokens_seconds',
                       'generation_response_seconds': 'seconds'}
@@ -177,13 +198,24 @@ def build_report(directory):
         'complete': not missing, 'valid_comparison_gate': not blockers,
         'evaluation_config': config, 'sandbox': manifest.get('sandbox'),
         'pacing': manifest.get('pacing'), 'runtime': manifest.get('runtime'),
+        'provider_config': provider_config, 'routed_providers': providers,
+        'response_models': response_models, 'routing_missing_responses': routing_missing,
+        'model_request_settings': {key: manifest[key] for key in ['reasoning_config', 'local_context_cap']
+                                   if key in manifest},
+        'routing_scope': 'Actual provider and model identifiers in recorded successful response metadata; configured routing alone does not establish which backend served requests.',
         'protocol_fingerprints': fingerprints,
         'successful_api_responses': len(successful),
         'api_errors': len(api_errors), 'local_quota_stops': len(quota_stops),
         'tokens': tokens, 'task_wall_seconds': sum(row['duration_seconds'] or 0 for row in outcomes),
         **timings, 'timing_record_counts': timing_counts,
         'timing_scope': 'Sums from recorded successful generation responses only. Failed/interrupted requests and missing timing fields are excluded; zero records means unknown, not zero elapsed time.',
-        'task_outcomes': outcomes, 'cost_usd': None, 'warnings': warnings,
+        'task_outcomes': outcomes, 'cost_usd': known_cost if cost_complete else None,
+        'known_response_cost_usd': known_cost,
+        'cost_reported_responses': len(reported_costs),
+        'cost_missing_responses': len(successful) - len(reported_costs),
+        'cost_complete_for_recorded_responses': cost_complete,
+        'cost_scope': 'Provider-reported USD cost from recorded successful response metadata, not an invoice. cost_usd is unknown if any successful response lacks cost metadata or no successful responses were recorded. The known subtotal excludes missing costs, failed/interrupted requests, and unrecorded charges; cached input is not added again.',
+        'warnings': warnings,
         'comparison_blockers': blockers,
         'usage_scope': 'Recorded response metadata only; interrupted in-flight requests may be absent. Cached input is a subset of prompt tokens, not additional tokens.',
         'promotion': 'manual_review_required',
@@ -197,11 +229,12 @@ def compare_reports(candidate, baseline):
         warnings.extend(f'{label}: {message}' for message in report['warnings'])
         if not report['valid_comparison_gate']:
             reasons.extend(f'{label}: {message}' for message in report['comparison_blockers'])
-    for key in ['model_id', 'backend', 'task_ids', 'evaluation_config', 'sandbox', 'pacing', 'runtime']:
+    for key in ['model_id', 'backend', 'task_ids', 'evaluation_config', 'sandbox', 'pacing', 'runtime',
+                'provider_config', 'routed_providers', 'response_models', 'model_request_settings']:
         if candidate[key] != baseline[key]:
             reasons.append(f'{key} differs between runs.')
-    for key in candidate['protocol_fingerprints']:
-        if candidate['protocol_fingerprints'][key] != baseline['protocol_fingerprints'][key]:
+    for key in candidate['protocol_fingerprints'].keys() | baseline['protocol_fingerprints'].keys():
+        if candidate['protocol_fingerprints'].get(key) != baseline['protocol_fingerprints'].get(key):
             reasons.append(f'{key} fingerprint differs; prompt-only attribution is not supported.')
     comparable = not reasons
     baseline_tasks = {row['task_id']: row for row in baseline['task_outcomes']}
@@ -219,6 +252,8 @@ def compare_reports(candidate, baseline):
             'paired_observations': paired,
             'success_rate_delta': candidate['success_rate'] - baseline['success_rate'] if comparable else None,
             'task_wall_seconds_delta': candidate['task_wall_seconds'] - baseline['task_wall_seconds'] if comparable else None,
+            'reported_cost_usd_delta': candidate['cost_usd'] - baseline['cost_usd']
+            if comparable and candidate['cost_usd'] is not None and baseline['cost_usd'] is not None else None,
             'promotion': 'manual_review_required',
             'interpretation': 'Paired development-task workflow observations under the recorded limits; no automatic promotion, pure capability score, or claim of general improvement.'}
 
@@ -236,13 +271,14 @@ def record_report(report, directory, root=ROOT, *, finalize_incomplete=False):
     log_path = (Path('runs') / relative).as_posix() + '/'
     row = {key: '' for key in FIELDS}
     row.update({key: report.get(key) if report.get(key) is not None else ''
-                for key in ['run_id', 'git_commit', 'backend', 'model_id', 'split_version', 'attempted', 'success_rate']})
+                for key in ['run_id', 'git_commit', 'backend', 'model_id', 'split_version', 'attempted', 'success_rate', 'cost_usd']})
     row.update(solved=report['resolved'], wall_seconds=report['task_wall_seconds'],
                config_path=config_path, log_path=log_path,
                notes=f"Completed {report['completed']}/{report['attempted']}; "
                      f"recorded tokens {report['tokens']['total_token_count']}; "
                      f"API errors {report['api_errors']}; local quota stops {report['local_quota_stops']}; "
                      + ('explicitly finalized incomplete; ' if not report['complete'] else '') +
+                     ('cost from recorded provider responses, not invoice; ' if report['cost_usd'] is not None else '') +
                      'billing unverified; manual review required')
     row = {key: str(value) for key, value in row.items()}
     with ledger.open(newline='', encoding='utf-8') as handle:

@@ -1,6 +1,33 @@
 # Session handoff
 
-Last updated: October 3, 2026 (Australia/Sydney). This is a historical checkpoint; inspect current files and Git state before making changes.
+Last updated: October 4, 2026 (Australia/Sydney). This is a historical checkpoint; inspect current files and Git state before making changes.
+
+## October 4 OpenRouter switch
+
+At the owner's explicit request, new local API runs now default to OpenRouter
+`google/gemma-4-31b-it`, pinned to `deepinfra/fp8` with provider fallback and
+SDK/harness error retries disabled. The distinct user-supplied profile was
+imported through the central encrypted credential workflow from this chat's
+existing authorized message, without a plaintext key file. The private local
+`openrouter_profile` selects it; the old AI Studio `profile` is retained.
+
+Authentication and a two-request tool-result roundtrip passed; see
+[docs/OPENROUTER.md](docs/OPENROUTER.md). This route has no AI Studio TPM pacing.
+Its published context is 262144 tokens, but no local competition-equivalent
+32768-token cap is enforced yet. Numeric thinking_budget=4096 is not enforced;
+reasoning is enabled using provider defaults. Official submission files remain
+unchanged. Select `--backend ai_studio` to reproduce the earlier backend.
+
+One unchanged-prompt `httpx_3672` baseline completed under
+`or-iter-001-httpx3672-20261004`: resolved, verifier exit 0, 24 tests passed,
+713.592 seconds, 34 model responses, 32 tool calls, 754375 tokens and
+US$0.11580450 response-reported cost. There were no API errors. Its largest input
+was 32936 tokens, exceeding the official total context window. An explicit
+SDK-copy fix was made after the run's source snapshot; preserve its original
+manifest and account for the adapter hash difference in future comparisons.
+The report and ledger row are recorded; no evaluation process remains active.
+Do not compare across backends as a prompt improvement. No ten-task batch,
+indefinite iteration loop or additional Kaggle submission was requested.
 
 ## October 3 configuration update
 

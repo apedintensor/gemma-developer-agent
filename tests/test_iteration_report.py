@@ -55,6 +55,27 @@ class IterationReportTests(unittest.TestCase):
         (directory / 'usage.jsonl').write_text('\n'.join(json.dumps(row) for row in usage), encoding='utf-8')
         return directory
 
+    def openrouter_fixture(self, name, usage):
+        directory = self.fixture(name)
+        manifest = reporter.read_json(directory / 'manifest.json')
+        manifest.update(backend='openrouter', model_id='google/gemma-4-31b-it',
+                        pacing={'mode': 'provider_managed', 'estimated_input_tokens': None,
+                                'window_seconds': None, 'automatic_retries': 0},
+                        provider_config={'only': ['deepinfra/fp8'], 'allow_fallbacks': False,
+                                         'require_parameters': True},
+                        reasoning_config={'enabled': True, 'max_tokens': 4096}, local_context_cap=None)
+        manifest['source_sha256']['tools/openrouter_model.py'] = 'same-openrouter-adapter'
+        self.write(directory / 'manifest.json', manifest)
+        (directory / 'usage.jsonl').write_text('\n'.join(json.dumps(row) for row in usage), encoding='utf-8')
+        return directory
+
+    def routed_response(self, cost=0.125, provider='DeepInfra', model='google/gemma-4-31b-it'):
+        return {'task': 'task_a', 'generation_id': 'synthetic-id', 'provider': provider,
+                'model_version': model, 'cost_usd': cost, 'usage': {
+                    'prompt_token_count': 100, 'cached_content_token_count': 80,
+                    'candidates_token_count': 10, 'thoughts_token_count': 5,
+                    'total_token_count': 115}}
+
     def test_missing_results_remain_in_denominator_and_block_comparison(self):
         baseline = self.fixture('baseline')
         incomplete = self.fixture('partial', [{'task_id': 'task_a', 'resolved': True, 'duration_seconds': 5}])
@@ -211,6 +232,75 @@ class IterationReportTests(unittest.TestCase):
         self.assertEqual(report['timing_record_counts'], {'pacing_wait_seconds': 1, 'count_tokens_seconds': 1,
                                                         'generation_response_seconds': 2})
         self.assertIn('recorded successful', report['timing_scope'])
+
+    def test_openrouter_cost_uses_response_metadata_and_cached_input_is_not_added_again(self):
+        directory = self.openrouter_fixture('paid', [self.routed_response(0.125), self.routed_response(0.375),
+                                                    {'task': 'task_b', 'error_type': 'ClientError', 'cost_usd': 99}])
+        report = reporter.build_report(directory)
+        self.assertEqual(report['cost_usd'], 0.5)
+        self.assertEqual((report['cost_reported_responses'], report['cost_missing_responses']), (2, 0))
+        self.assertTrue(report['cost_complete_for_recorded_responses'])
+        self.assertEqual(report['tokens']['prompt_token_count'], 200)
+        self.assertEqual(report['tokens']['cached_content_token_count'], 160)
+        self.assertEqual(report['tokens']['total_token_count'], 230)
+        self.assertIn('not an invoice', report['cost_scope'])
+        reporter.record_report(report, directory, self.root)
+        with (self.root / 'experiments/results.csv').open(newline='', encoding='utf-8') as handle:
+            row = next(csv.DictReader(handle))
+        self.assertEqual(row['cost_usd'], '0.5')
+        self.assertIn('not invoice', row['notes'])
+
+    def test_missing_cost_stays_unknown_while_explicit_provider_zero_is_preserved(self):
+        directory = self.openrouter_fixture('partial-cost', [self.routed_response(0.125), self.routed_response(None)])
+        report = reporter.build_report(directory)
+        self.assertIsNone(report['cost_usd'])
+        self.assertEqual(report['known_response_cost_usd'], 0.125)
+        self.assertEqual((report['cost_reported_responses'], report['cost_missing_responses']), (1, 1))
+        self.assertFalse(report['cost_complete_for_recorded_responses'])
+        reporter.record_report(report, directory, self.root)
+        with (self.root / 'experiments/results.csv').open(newline='', encoding='utf-8') as handle:
+            self.assertEqual(next(csv.DictReader(handle))['cost_usd'], '')
+        zero = reporter.build_report(self.openrouter_fixture('zero-cost', [self.routed_response(0)]))
+        self.assertEqual(zero['cost_usd'], 0)
+        self.assertTrue(zero['cost_complete_for_recorded_responses'])
+        empty = reporter.build_report(self.openrouter_fixture('no-responses', []))
+        self.assertIsNone(empty['cost_usd'])
+        self.assertIsNone(empty['known_response_cost_usd'])
+
+    def test_actual_routing_and_provider_configuration_are_required_for_prompt_comparison(self):
+        baseline = reporter.build_report(self.openrouter_fixture('route-baseline', [self.routed_response()]))
+        same = reporter.build_report(self.openrouter_fixture('route-same', [self.routed_response(), self.routed_response()]))
+        self.assertTrue(reporter.compare_reports(same, baseline)['comparable'])
+        self.assertEqual(baseline['routed_providers'], ['DeepInfra'])
+        self.assertEqual(baseline['response_models'], ['google/gemma-4-31b-it'])
+        for name, usage in [
+            ('changed-provider', [self.routed_response(provider='OtherProvider')]),
+            ('changed-model', [self.routed_response(model='other-model')]),
+            ('mixed-provider', [self.routed_response(), self.routed_response(provider='OtherProvider')]),
+            ('unknown-provider', [self.routed_response(provider=None)]),
+            ('unknown-model', [self.routed_response(model=None)]),
+        ]:
+            with self.subTest(name=name):
+                candidate = reporter.build_report(self.openrouter_fixture(name, usage))
+                comparison = reporter.compare_reports(candidate, baseline)
+                self.assertFalse(comparison['comparable'])
+                self.assertTrue(comparison['comparison_blockers'])
+                self.assertIsNone(comparison['success_rate_delta'])
+        changed_config = self.openrouter_fixture('changed-routing-config', [self.routed_response()])
+        manifest = reporter.read_json(changed_config / 'manifest.json')
+        manifest['provider_config']['allow_fallbacks'] = True
+        self.write(changed_config / 'manifest.json', manifest)
+        self.assertFalse(reporter.compare_reports(reporter.build_report(changed_config), baseline)['comparable'])
+        manifest['provider_config']['allow_fallbacks'] = False
+        for key, value in [('reasoning_config', {'enabled': False}), ('local_context_cap', 32000)]:
+            with self.subTest(setting=key):
+                changed = dict(manifest, **{key: value})
+                self.write(changed_config / 'manifest.json', changed)
+                comparison = reporter.compare_reports(reporter.build_report(changed_config), baseline)
+                self.assertFalse(comparison['comparable'])
+                self.assertTrue(any('model_request_settings' in message for message in comparison['warnings']))
+        ai_studio = reporter.build_report(self.fixture('ai-studio-comparison'))
+        self.assertFalse(reporter.compare_reports(baseline, ai_studio)['comparable'])
 
     def test_unselected_duplicate_or_conflicting_tasks_are_rejected(self):
         directory = self.fixture('invalid')

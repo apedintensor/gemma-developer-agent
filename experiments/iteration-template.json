@@ -2,11 +2,13 @@
   "schema_version": 1,
   "cycle_id": "REPLACE_WITH_UNIQUE_CYCLE_ID",
   "status": "planned",
-  "scope": "Current invocation: one development-task baseline. Future scoped batches may iterate autonomously within their declared limits.",
-  "development_task_ids": ["httpx_3672"],
+  "scope": "One development-task baseline by default. Future scoped batches may iterate autonomously within their declared limits.",
+  "development_task_ids": [
+    "httpx_3672"
+  ],
   "split_role": "development; not held-out validation",
-  "backend": "ai_studio",
-  "model_id": "gemma-4-31b-it",
+  "backend": "openrouter",
+  "model_id": "google/gemma-4-31b-it",
   "official_model_id_for_separate_confirmation": "gemma-4-31b-it-qat-w4a16-ct",
   "fixed_conditions": {
     "max_time_minutes": null,
@@ -17,9 +19,13 @@
     "temperature": 0.2,
     "top_p": 0.95,
     "max_output_tokens": 16384,
-    "thinking_level": "high",
     "task_snapshot_hashes_path": null,
-    "dependency_snapshot_path": null
+    "dependency_snapshot_path": null,
+    "reasoning": {
+      "enabled": true,
+      "exclude": false
+    },
+    "local_context_cap": null
   },
   "baseline": {
     "run_id": null,
@@ -59,7 +65,11 @@
     "published_rate_estimate_usd": null,
     "pricing_source_and_date": null,
     "decision": null,
-    "allowed_decisions": ["keep_provisionally", "revert", "inconclusive"],
+    "allowed_decisions": [
+      "keep_provisionally",
+      "revert",
+      "inconclusive"
+    ],
     "rationale": null
   },
   "stop_rules": {
@@ -81,5 +91,12 @@
     "ids_declared_before_execution": null,
     "official_model_confirmation_run_id": null
   },
-  "notes": "Copy this template into ignored run storage. Preserve completed snapshots and all failures. Do not include secrets, reference fixes or restricted task contents in public records."
+  "notes": "Copy this template into ignored run storage. Preserve completed snapshots and all failures. Do not include secrets, reference fixes or restricted task contents in public records.",
+  "provider_config": {
+    "only": [
+      "deepinfra/fp8"
+    ],
+    "allow_fallbacks": false,
+    "require_parameters": true
+  }
 }
